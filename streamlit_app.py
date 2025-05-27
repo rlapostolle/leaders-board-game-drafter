@@ -2,39 +2,117 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
+import os, base64, json
 
-"""
-# Welcome to Streamlit!
+def get_image_as_base64(img_path):
+    with open(img_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+with open(os.path.join(os.getcwd(), "config.json"), "r", encoding="utf8") as f:
+    data = json.load(f)
+image_folder = os.path.join(os.getcwd(), "images")
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+if 'own_units' not in st.session_state:
+    st.session_state.own_units = []
+if 'oppo_units' not in st.session_state:
+    st.session_state.oppo_units = []
+if 'ban_units' not in st.session_state:
+    st.session_state.ban_units = []
+if 'available_units' not in st.session_state:
+    st.session_state.available_units = []
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+unit_defs = data["characters"]
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+for unit in unit_defs:
+    unit.setdefault("do_counter", [])
+    for other in unit_defs:
+        for other_counter in other["counters"]:
+            if other_counter["name"] == unit["name"]:
+                unit["do_counter"].append(other)
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+for unit in unit_defs:
+    cols = st.columns([0.2, 0.8])
+    unit_id = unit["name"]
+    img_path = os.path.join(image_folder, unit["img"])
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+    cols[0].image(img_path, width=100)
+    container = cols[1].container()
+    rating = unit["rating"]
+    container.text(unit["name"])
+    container.text(f"Rating: {rating:.0f}")
+    selection = container.segmented_control("State", ["Avail", "Pick", "Ban", "Oppo"], selection_mode="single", default="Avail", key=f"segmented:{unit_id}", label_visibility="collapsed")
+    if selection == "Oppo":
+        if unit_id not in st.session_state.oppo_units:
+            st.session_state.oppo_units.append(unit_id)
+        if unit_id in st.session_state.own_units:
+            st.session_state.own_units.remove(unit_id)
+        if unit_id in st.session_state.ban_units:
+            st.session_state.ban_units.remove(unit_id)
+        if unit_id in st.session_state.available_units:
+            st.session_state.available_units.remove(unit_id)
+    elif selection == "Avail":
+        if unit_id in st.session_state.own_units:
+            st.session_state.own_units.remove(unit_id)
+        if unit_id in st.session_state.oppo_units:
+            st.session_state.oppo_units.remove(unit_id)
+        if unit_id in st.session_state.ban_units:
+            st.session_state.ban_units.remove(unit_id)
+        if unit_id not in st.session_state.available_units:
+            st.session_state.available_units.append(unit_id)
+    elif selection == "Ban":
+        if unit_id not in st.session_state.ban_units:
+            st.session_state.ban_units.append(unit_id)
+        if unit_id in st.session_state.own_units:
+            st.session_state.own_units.remove(unit_id)
+        if unit_id in st.session_state.oppo_units:
+            st.session_state.oppo_units.remove(unit_id)
+        if unit_id in st.session_state.available_units:
+            st.session_state.available_units.remove(unit_id)
+    elif selection == "Pick":
+        if unit_id not in st.session_state.own_units:
+            st.session_state.own_units.append(unit_id)
+        if unit_id in st.session_state.oppo_units:
+            st.session_state.oppo_units.remove(unit_id)
+        if unit_id in st.session_state.ban_units:
+            st.session_state.ban_units.remove(unit_id)
+        if unit_id in st.session_state.available_units:
+            st.session_state.available_units.remove(unit_id)
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+ordered_units = []
+for unit in unit_defs:
+    score = unit["rating"]
+    # check if the unit is in own_units or oppo_units
+    for oppo_avail_unit_id in st.session_state.oppo_units + st.session_state.available_units:
+        counters = unit["counters"] if unit["counters"] else []
+        found = next(filter(lambda x : x["name"] == oppo_avail_unit_id, counters), None)
+        if found != None:
+            score -= found["rating"]
+    for oppo_unit_id in st.session_state.oppo_units:
+        do_counter = unit["do_counter"] if unit["do_counter"] else []
+        found = next(filter(lambda x : x["name"] == oppo_unit_id, do_counter), None)
+        if found != None:
+            score += found["rating"]
+    if score < min(20, unit["rating"]):
+        score = min(20, unit["rating"])
+    ordered_units.append((unit, score))
+
+
+ordered_units.sort(key=lambda x: x[1], reverse=True)
+
+with st.sidebar:
+    for (unit, score) in ordered_units:
+        unit_id = unit["name"]
+        img_path = os.path.join(image_folder, unit["img"])
+        
+        containers = st.columns([0.3, 0.4, 0.3])
+        containers[0].image(img_path, width=50)
+        if unit_id in st.session_state.own_units:
+            color = "green"
+        if unit_id in st.session_state.ban_units:
+            color = "red"
+        if unit_id in st.session_state.oppo_units:
+            color = "violet"
+        if unit_id in st.session_state.available_units:
+            color = None
+        containers[1].markdown(':' + color + '[' + unit["name"] + ']' if color else unit["name"])
+        containers[2].text(f"Score: {score:.02f}")

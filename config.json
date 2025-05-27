@@ -1,0 +1,163 @@
+{
+    "characters": [
+        {
+            "name": "Vieil Ours",
+            "img": "hermit.png",
+            "rating": 95,
+            "allied": [],
+            "counters": [
+            ]
+        },
+        {
+            "name": "Archère",
+            "img": "archer.png",
+            "rating": 19,
+            "counters": []
+        },
+        {
+            "name": "Cavalier",
+            "img": "rider.png",
+            "rating": 40,
+            "counters": []
+        },
+        {
+            "name": "Manipulatrice",
+            "img": "manipulator.png",
+            "rating": 30,
+            "counters": [
+                {
+                    "name": "Protecteur",
+                    "rating": 20
+                },
+                {
+                    "name": "Gêolier",
+                    "rating": 5
+                }
+            ]
+        },
+        {
+            "name": "Cogneur",
+            "img": "bruiser.png",
+            "rating": 100,
+            "counters": [
+                {
+                    "name": "Protecteur",
+                    "rating": 70
+                },
+                {
+                    "name": "Gêolier",
+                    "rating": 70
+                }
+            ]
+        },
+        {
+            "name": "Assassin",
+            "img": "assassin.png",
+            "rating": 55,
+            "counters": []
+        },
+        {
+            "name": "Némésis",
+            "img": "nemesis.png",
+            "rating": 0,
+            "counters": [
+                {
+                    "name": "Vizir",
+                    "rating": 20
+                }
+            ]
+        },
+        {
+            "name": "Vizir",
+            "img": "vizier.png",
+            "rating": 70,
+            "counters": []
+        },
+        {
+            "name": "Gêolier",
+            "img": "jailer.png",
+            "rating": 20,
+            "counters": []
+        },
+        {
+            "name": "Protecteur",
+            "img": "protector.png",
+            "rating": 20,
+            "counters": []
+        },
+        {
+            "name": "Acrobate",
+            "img": "acrobate.png",
+            "rating": 90,
+            "counters": [
+                {
+                    "name": "Gêolier",
+                    "rating": 10
+                }
+            ]
+        },
+        {
+            "name": "Garde Royale",
+            "img": "royalguard.png",
+            "rating": 95,
+            "counters": [
+                {
+                    "name": "Gêolier",
+                    "rating": 5
+                }
+            ]
+        },
+        {
+            "name": "Illusionniste",
+            "img": "illusionist.png",
+            "rating": 85,
+            "counters": [
+                {
+                    "name": "Protecteur",
+                    "rating": 30
+                },
+                {
+                    "name": "Gêolier",
+                    "rating": 30
+                }
+            ]
+        },
+        {
+            "name": "Lance-Grappin",
+            "img": "clawlauncher.png",
+            "rating": 90,
+            "counters": [
+                {
+                    "name": "Protecteur",
+                    "rating": 5
+                },
+                {
+                    "name": "Gêolier",
+                    "rating": 10
+                }
+            ]
+        },
+        {
+            "name": "Rodeuse",
+            "img": "wanderer.png",
+            "rating": 40,
+            "counters": [
+                {
+                    "name": "Gêolier",
+                    "rating": 10
+                }
+            ]
+        },
+        {
+            "name": "Tavernier",
+            "img": "brewmaster.png",
+            "rating": 70,
+            "counters": [
+                {
+                    "name": "Gêolier",
+                    "rating": 40
+                }
+            ]
+        }
+    ]
+}
