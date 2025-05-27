@@ -42,11 +42,11 @@
             "counters": [
                 {
                     "name": "Protecteur",
-                    "rating": 70
+                    "rating": 80
                 },
                 {
                     "name": "Gêolier",
-                    "rating": 70
+                    "rating": 80
                 }
             ]
         },
